@@ -1,0 +1,45 @@
+services:
+  client:
+    build:
+      context: ThesisCatalog.Client
+      target: final
+    ports:
+      - 8000:80
+      - 8001:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    volumes:
+      - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
+      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet/https:ro
+    image: thesis-client
+    container_name: thesis-client
+    depends_on: [ server ]
+  server:
+    build:
+      context: ThesisCatalog.API
+      target: final
+    ports:
+      - 8080:80
+      - 8081:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    volumes:
+      - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
+      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet/https:ro
+    image: thesis-server
+    container_name: thesis-server
+    depends_on: [ database ]    
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=true
+      - MSSQL_SA_PASSWORD=localDevPassw0rd!
+    ports:
+      - 1433:1433
+    volumes:
+      - sqldb-data:/var/opt/mssql
+    container_name: thesis-database
+volumes: 
+  sqldb-data:
