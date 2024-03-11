@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThesisCatalog.API", "ThesisCatalog.API\ThesisCatalog.API.csproj", "{548D6657-2528-411C-802C-5B099C8B8E22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{557F362D-7019-4F2A-8494-41117729C9EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThesisCatalog.Core", "ThesisCatalog.Core\ThesisCatalog.Core.csproj", "{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{DCA2D237-F9D0-4EB6-8BC4-B8D5C4B70C62}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{98E146E9-D43D-4BEE-9268-145D449817AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThesisCatalog.Client", "ThesisCatalog.Client\ThesisCatalog.Client.csproj", "{2B5C251C-9C83-4873-97D6-C26532255703}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{548D6657-2528-411C-802C-5B099C8B8E22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{548D6657-2528-411C-802C-5B099C8B8E22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{548D6657-2528-411C-802C-5B099C8B8E22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{548D6657-2528-411C-802C-5B099C8B8E22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B5C251C-9C83-4873-97D6-C26532255703}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B5C251C-9C83-4873-97D6-C26532255703}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B5C251C-9C83-4873-97D6-C26532255703}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B5C251C-9C83-4873-97D6-C26532255703}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C82F2D6-6158-4FA4-BA22-70BC7EBF5049} = {557F362D-7019-4F2A-8494-41117729C9EA}
+		{548D6657-2528-411C-802C-5B099C8B8E22} = {DCA2D237-F9D0-4EB6-8BC4-B8D5C4B70C62}
+		{2B5C251C-9C83-4873-97D6-C26532255703} = {98E146E9-D43D-4BEE-9268-145D449817AF}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,6 @@
+@ThesisCatalog.API_HostAddress = http://localhost:5195
+
+GET {{ThesisCatalog.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
