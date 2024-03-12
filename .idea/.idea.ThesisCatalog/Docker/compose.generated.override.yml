@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  server:
+    build:
+      context: "/Users/unndunn/Misc/Thesis Catalog/src/ThesisCatalog/ThesisCatalog.API"
+      dockerfile: "Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net8.0/ThesisCatalog.API.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "thesis-server:dev"
+    ports: []
+    volumes:
+    - "/Users/unndunn/.nuget/packages:/home/app/.nuget/packages"
+    - "/Users/unndunn/Misc/Thesis Catalog/src/ThesisCatalog/ThesisCatalog.API:/app:rw"
+    - "/Users/unndunn/Misc/Thesis Catalog/src/ThesisCatalog:/src:rw"
+    working_dir: "/app"

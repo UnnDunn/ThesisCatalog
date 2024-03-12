@@ -20,4 +20,16 @@ RUN dotnet publish "ThesisCatalog.Client.csproj" -c $BUILD_CONFIGURATION -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Create a non-privileged user that the app will run under.
+# See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
+ARG UID=10001
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    appuser
+USER appuser
+
 ENTRYPOINT ["dotnet", "ThesisCatalog.Client.dll"]

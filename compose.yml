@@ -11,7 +11,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
     volumes:
       - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
-      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet/https:ro
+      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet:ro
     image: thesis-client
     container_name: thesis-client
     depends_on: [ server ]
@@ -25,9 +25,11 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/appuser/.aspnet/https/ThesisCatalog.API.pfx
     volumes:
       - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
-      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet/https:ro
+      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet:ro
     image: thesis-server
     container_name: thesis-server
     depends_on: [ database ]    
