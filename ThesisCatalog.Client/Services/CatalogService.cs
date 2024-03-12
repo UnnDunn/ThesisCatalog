@@ -42,7 +42,7 @@ public class CatalogService
                     },
                     GpuDescriptor = new ComponentDescriptor
                         { Manufacturer = Manufacturers[3], ModelName = "GeForce GTX 770" },
-                    Weight = new Weight { WeightAmount = 8100, Unit = WeightUnit.Grams },
+                    Weight = new Weight(8100, WeightUnit.Grams),
                     PsuRating = 500,
                     CpuDescriptor = new ComponentDescriptor
                         { Manufacturer = Manufacturers[1], ModelName = "Celeron N3050" }
@@ -69,7 +69,7 @@ public class CatalogService
                         Manufacturer = Manufacturers[3],
                         ModelName = "GeForce GTX 960"
                     },
-                    Weight = new Weight { WeightAmount = 12000, Unit = WeightUnit.Grams },
+                    Weight = new Weight(12, WeightUnit.Kilograms),
                     PsuRating = 500,
                     CpuDescriptor = new ComponentDescriptor
                     {
@@ -94,7 +94,7 @@ public class CatalogService
                         Manufacturer = Manufacturers[2],
                         ModelName = "Radeon R7360"
                     },
-                    Weight = new Weight { WeightAmount = 16, Unit = WeightUnit.Pounds },
+                    Weight = new Weight(16, WeightUnit.Pounds),
                     PsuRating = 450,
                     CpuDescriptor = new ComponentDescriptor
                     {
@@ -106,7 +106,7 @@ public class CatalogService
         };
     }
 
-    public Dictionary<int, ComputerCatalogItem> GetAllComponents()
+    public Dictionary<int, ComputerCatalogItem> GetAllCatalogItems()
     {
         var result = new Dictionary<int, ComputerCatalogItem>(CatalogItems);
         return result;

@@ -1,0 +1,28 @@
+@page "/Catalog"
+@using ThesisCatalog.Core.Entities
+@using ThesisCatalog.Client.Services
+@inject CatalogService CatalogService
+<PageTitle>Catalog</PageTitle>
+
+<h1>Catalog</h1>
+
+@if (AllCatalogItems.Any())
+{
+    <p>@AllCatalogItems.Keys.Count catalog item(s) will be rendered here</p>
+}
+else
+{
+    <p>No catalog items were found.</p>
+}
+
+@code {
+    private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var catalogItems = CatalogService.GetAllCatalogItems();
+        AllCatalogItems = catalogItems;
+    }
+
+}
