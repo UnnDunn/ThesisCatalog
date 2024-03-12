@@ -2,5 +2,5 @@ namespace ThesisCatalog.Core.Entities;
 
 public enum WeightUnit
 {
-    Grams, Pounds
+    Grams, Kilograms, Pounds
 }
