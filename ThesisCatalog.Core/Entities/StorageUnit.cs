@@ -1,6 +1,6 @@
 namespace ThesisCatalog.Core.Entities;
 
-public enum StorageType
+public enum StorageUnit
 {
-    HDD, SSD
+    MB, GB, TB
 }

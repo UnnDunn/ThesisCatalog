@@ -1,6 +1,6 @@
 namespace ThesisCatalog.Core.Entities;
 
-public enum StorageType
+public enum WeightUnit
 {
-    HDD, SSD
+    Grams, Pounds
 }
