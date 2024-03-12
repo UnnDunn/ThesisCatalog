@@ -1,20 +1,20 @@
 services:
-  client:
-    build:
-      context: ThesisCatalog.Client
-      target: final
-    ports:
-      - 8000:80
-      - 8001:443
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-    volumes:
-      - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
-      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet:ro
-    image: thesis-client
-    container_name: thesis-client
-    depends_on: [ server ]
+#  client:
+#    build:
+#      context: ThesisCatalog.Client
+#      target: final
+#    ports:
+#      - 8000:80
+#      - 8001:443
+#    environment:
+#      - ASPNETCORE_ENVIRONMENT=Development
+#      - ASPNETCORE_URLS=https://+:443;http://+:80
+#    volumes:
+#      - ${DOTNET_USERSECRETS_PATH}:/home/appuser/.microsoft/usersecrets:ro
+#      - ${CERTIFICATE_PATH}:/home/appuser/.aspnet:ro
+#    image: thesis-client
+#    container_name: thesis-client
+#    depends_on: [ server ]
   server:
     build:
       context: ThesisCatalog.API
