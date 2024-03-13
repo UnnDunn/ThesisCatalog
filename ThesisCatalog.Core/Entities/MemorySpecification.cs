@@ -2,18 +2,31 @@ namespace ThesisCatalog.Core.Entities;
 
 public record MemorySpecification
 {
-    public int Quantity { get; set; }
-    public StorageUnit Unit { get; set; } = StorageUnit.GB;
+    public ulong ByteQuantity { get; init; }
+    public StorageUnit DisplayUnit { get; init; } = StorageUnit.GB;
+
+    public MemorySpecification(uint quantity, StorageUnit displayUnit)
+    {
+        var multiplier = Math.Pow(1024, (int)displayUnit);
+        var byteQuantity = quantity * multiplier;
+
+        ByteQuantity = Convert.ToUInt64(Math.Round(byteQuantity));
+        DisplayUnit = displayUnit;
+    }
 
     public override string ToString()
     {
-        var suffix = Unit switch
+        var divisor = Math.Pow(1024, (int)DisplayUnit);
+        var quantity = ByteQuantity / divisor;
+        
+        var suffix = DisplayUnit switch
         {
+            StorageUnit.kB => "kB",
             StorageUnit.GB => "GB",
             StorageUnit.TB => "TB",
             StorageUnit.MB => "MB",
             _ => string.Empty
         };
-        return string.Concat(Quantity, suffix);
+        return $"{quantity:N}{suffix}";
     }
 }

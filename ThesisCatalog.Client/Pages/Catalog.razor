@@ -1,14 +1,23 @@
 @page "/Catalog"
 @using ThesisCatalog.Core.Entities
 @using ThesisCatalog.Client.Services
+@using ThesisCatalog.Core.Extensions
 @inject CatalogService CatalogService
 <PageTitle>Catalog</PageTitle>
 
 <h1>Catalog</h1>
 
-@if (AllCatalogItems.Any())
+@if (DisplayCatalogItems is not null && DisplayCatalogItems.Any())
 {
-    <p>@AllCatalogItems.Keys.Count catalog item(s) will be rendered here</p>
+    <FluentDataGrid Items="@DisplayCatalogItems">
+        <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
+        <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage" />
+        <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports" />
+        <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics" />
+        <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts" />
+        <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight" />
+        <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU" />
+    </FluentDataGrid>
 }
 else
 {
@@ -17,11 +26,13 @@ else
 
 @code {
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
+    private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         var catalogItems = CatalogService.GetAllCatalogItems();
+        DisplayCatalogItems = catalogItems.Values.AsQueryable();
         AllCatalogItems = catalogItems;
     }
 
