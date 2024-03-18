@@ -29,7 +29,7 @@ else
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
     private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         using var logScope = Logger.BeginScope("Getting catalog items from API");

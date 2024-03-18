@@ -79,7 +79,7 @@ public class CatalogService
             manufacturers =
             [
                 new Manufacturer { Name = "Intel", ComponentTypes = ComponentType.Cpu | ComponentType.Gpu },
-                new Manufacturer { Name = "AMD", ComponentTypes = ComponentType.Gpu | ComponentType.Gpu },
+                new Manufacturer { Name = "AMD", ComponentTypes = ComponentType.Cpu | ComponentType.Gpu },
                 new Manufacturer { Name = "NVIDIA", ComponentTypes = ComponentType.Gpu },
                 new Manufacturer { Name = "Qualcomm", ComponentTypes = ComponentType.Cpu }
             ];

@@ -1,0 +1,61 @@
+@using ThesisCatalog.Core.Entities
+@using ThesisCatalog.Client.Services
+@inject CatalogService CatalogService;
+@inject ILogger<ComponentEditor> Logger;
+
+<FluentCombobox 
+    Items="ValidManufacturers" 
+    OptionValue="@(i => i.Value)" 
+    OptionText="@(i => i.Text)" 
+    @bind-SelectedOption="SelectedManufacturer"
+    @bind-SelectedOption:after="ComponentDescriptorChangeHandler"
+    Label="Manufacturer"/>
+<FluentTextField @bind-Value="ModelName" @bind-Value:after="ComponentDescriptorChangeHandler" Label="Model" />
+
+@code {
+    [Parameter]
+    public ComponentType ComponentType { get; set; }
+
+    private ComponentDescriptor _componentDescriptor = new();
+    
+    [Parameter] public EventCallback<ComponentDescriptor> ComponentDescriptorChanged { get; set; }
+    
+    [Parameter] public ComponentDescriptor ComponentDescriptor { get; set; } = new();
+
+    public Option<string>? SelectedManufacturer { get; set; }
+    
+    public string ModelName { get; set; } = string.Empty;
+    
+    public List<Option<string>> ValidManufacturers { get; private set; } = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _componentDescriptor = ComponentDescriptor;
+        using var logScope = Logger.BeginScope("Getting valid manufacturers for component type {componentType}", ComponentType);
+        var manufacturers = await CatalogService.GetAllComponentManufacturersAsync();
+        var validManufacturers = manufacturers.Values.Where(m => (m.ComponentType & ComponentType) > 0).ToList();
+        Logger.LogInformation("{validManufacturerCount} valid manufacturers found", validManufacturers.Count);
+        ValidManufacturers.Clear();
+        ValidManufacturers.AddRange(validManufacturers.Select(v => new Option<string>()
+        {
+            Value = v.Id.ToString(),
+            Text = v.Name,
+            Selected = v.Id == (_componentDescriptor?.Manufacturer.Id ?? 0)
+        }));
+    }
+
+    private async Task ComponentDescriptorChangeHandler()
+    {
+        if (SelectedManufacturer?.Value is null || SelectedManufacturer.Text is null) return;
+        Logger.LogInformation("Component Descriptor changed - Manufacturer: {manufacturerName} ({manufacturerId}), Model Name: {modelName}",
+            SelectedManufacturer.Text,
+            SelectedManufacturer.Value,
+            ModelName);
+        _componentDescriptor.ModelName = ModelName;
+        _componentDescriptor.Manufacturer.Id = int.Parse(SelectedManufacturer.Value);
+        _componentDescriptor.Manufacturer.Name = SelectedManufacturer.Text;
+
+        await ComponentDescriptorChanged.InvokeAsync(_componentDescriptor);
+    }
+
+}

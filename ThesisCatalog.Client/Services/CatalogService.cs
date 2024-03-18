@@ -24,7 +24,7 @@ public class CatalogService
         CatalogItems = new List<ComputerCatalogItem>();
         
         // seed design-time data
-        SeedDesignTimeData();
+        // SeedDesignTimeData();
     }
 
     private void SeedDesignTimeData()
@@ -147,7 +147,8 @@ public class CatalogService
 
     public async Task<Dictionary<int, ComponentManufacturer>> GetAllComponentManufacturersAsync()
     {
-        // using var http = _httpClientFactory.CreateClient();
+        if (Manufacturers.Count != 0) return Manufacturers.ToDictionary(m => m.Id);
+
         using var logScope = _logger.BeginScope("Getting component manufacturers from API");
         var response = await _httpClient.GetAsync("api/Catalog/manufacturers");
         if (response.IsSuccessStatusCode)
@@ -156,7 +157,9 @@ public class CatalogService
             var manufacturers = JsonSerializer.Deserialize(content,
                 ThesisCatalogJsonSerializerContext.Default.ListComponentManufacturer);
             _logger.LogInformation("{manufacturerCount} manufacturers retrieved", manufacturers?.Count ?? 0);
-            return manufacturers?.ToDictionary(m => m.Id) ?? new Dictionary<int, ComponentManufacturer>();
+            Manufacturers.Clear();
+            Manufacturers.AddRange(manufacturers ?? []);
+            return Manufacturers.ToDictionary(m => m.Id);
         }
         else
         {
