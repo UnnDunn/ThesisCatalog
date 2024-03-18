@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ThesisCatalog.Core.Entities;
 
 public record StorageSpecification
@@ -16,11 +18,12 @@ public record StorageSpecification
         StorageType = type;
     }
 
-    public StorageSpecification(long byteQuantity, StorageUnit displayUnit, StorageType type)
+    [JsonConstructor]
+    public StorageSpecification(long byteQuantity, StorageUnit displayUnit, StorageType storageType)
     {
         ByteQuantity = byteQuantity;
         DisplayUnit = displayUnit;
-        StorageType = type;
+        StorageType = storageType;
     }
     
     public StorageSpecification() {}

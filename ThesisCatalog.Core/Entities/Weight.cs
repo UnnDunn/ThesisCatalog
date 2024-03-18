@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ThesisCatalog.Core.Entities;
 
 public record Weight
@@ -10,6 +12,13 @@ public record Weight
     {
         var gramsAmount = ConvertToGrams(amount, displayUnit);
         Grams = gramsAmount;
+        DisplayUnit = displayUnit;
+    }
+
+    [JsonConstructor]
+    public Weight(int grams, WeightUnit displayUnit)
+    {
+        Grams = grams;
         DisplayUnit = displayUnit;
     }
 

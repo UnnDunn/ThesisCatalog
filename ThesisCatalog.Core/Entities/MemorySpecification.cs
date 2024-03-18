@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ThesisCatalog.Core.Entities;
 
 public record MemorySpecification
@@ -14,6 +16,7 @@ public record MemorySpecification
         DisplayUnit = displayUnit;
     }
 
+    [JsonConstructor]
     public MemorySpecification(long byteQuantity, StorageUnit displayUnit)
     {
         ByteQuantity = byteQuantity;

@@ -3,6 +3,7 @@
 @using ThesisCatalog.Client.Services
 @using ThesisCatalog.Core.Extensions
 @inject CatalogService CatalogService
+@inject ILogger<Catalog> Logger
 <PageTitle>Catalog</PageTitle>
 
 <h1>Catalog</h1>
@@ -28,12 +29,15 @@ else
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
     private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
-        base.OnInitialized();
-        var catalogItems = CatalogService.GetAllCatalogItems();
+        await base.OnInitializedAsync();
+        using var logScope = Logger.BeginScope("Getting catalog items from API");
+        var catalogItems = await CatalogService.GetAllCatalogItemsAsync();
+        Logger.LogInformation("{catalogItemCount} items found", catalogItems.Values.Count);
         DisplayCatalogItems = catalogItems.Values.AsQueryable();
         AllCatalogItems = catalogItems;
+        Logger.LogInformation("DisplayCatalogItems has {displayCatalogItemsCount} items", DisplayCatalogItems.Count());
+        StateHasChanged();
     }
-
 }

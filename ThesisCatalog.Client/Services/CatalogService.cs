@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.FluentUI.AspNetCore.Components;
 using ThesisCatalog.Core.Entities;
 
@@ -8,8 +9,17 @@ public class CatalogService
     private List<ComponentManufacturer> Manufacturers { get; set; }
     private List<ComputerCatalogItem> CatalogItems { get; set; }
 
-    public CatalogService()
+    private readonly ILogger<CatalogService> _logger;
+
+    // private ThesisHttpClientFactory _httpClientFactory;
+
+    private readonly HttpClient _httpClient;
+
+    public CatalogService(HttpClient httpClient, ILogger<CatalogService> logger)
     {
+        // _httpClientFactory = httpClientFactory;
+        _httpClient = httpClient;
+        _logger = logger;
         Manufacturers = new List<ComponentManufacturer>();
         CatalogItems = new List<ComputerCatalogItem>();
         
@@ -115,5 +125,42 @@ public class CatalogService
             : Manufacturers
                 .Where(m => (m.ComponentType & componentTypeFilter.Value) > 0)
                 .ToDictionary(m => m.Id);
+    }
+
+    public async Task<Dictionary<int, ComputerCatalogItem>> GetAllCatalogItemsAsync()
+    {
+        // using var http = _httpClientFactory.CreateClient();
+        using var logScope = _logger.BeginScope("Getting catalog items from API");
+        var response = await _httpClient.GetAsync("api/Catalog/items");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var catalogItems = JsonSerializer.Deserialize(content, ThesisCatalogJsonSerializerContext.Default.ListComputerCatalogItem);
+            _logger.LogInformation("{catalogItemCount} items retrieved", catalogItems?.Count ?? 0);
+            return catalogItems?.ToDictionary(c => c.Id) ?? new Dictionary<int, ComputerCatalogItem>();
+        }
+        else
+        {
+            throw new Exception("Failed to retrieve catalog items.");
+        }
+    }
+
+    public async Task<Dictionary<int, ComponentManufacturer>> GetAllComponentManufacturersAsync()
+    {
+        // using var http = _httpClientFactory.CreateClient();
+        using var logScope = _logger.BeginScope("Getting component manufacturers from API");
+        var response = await _httpClient.GetAsync("api/Catalog/manufacturers");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var manufacturers = JsonSerializer.Deserialize(content,
+                ThesisCatalogJsonSerializerContext.Default.ListComponentManufacturer);
+            _logger.LogInformation("{manufacturerCount} manufacturers retrieved", manufacturers?.Count ?? 0);
+            return manufacturers?.ToDictionary(m => m.Id) ?? new Dictionary<int, ComponentManufacturer>();
+        }
+        else
+        {
+            throw new Exception("Failed to retrieve component manufacturers.");
+        }
     }
 }
