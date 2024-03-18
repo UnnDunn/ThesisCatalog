@@ -7,7 +7,7 @@ public record ComputerCatalogItem
     public StorageSpecification StorageSpecification { get; set; } = null!;
     public UsbSpecification UsbSpecification { get; set; } = null!;
     public Weight Weight { get; set; } = null!;
-    public int PsuRating { get; set; }
+    public short PsuRating { get; set; }
     public ComponentDescriptor GpuDescriptor { get; set; } = null!;
     public ComponentDescriptor CpuDescriptor { get; set; } = null!;
 }

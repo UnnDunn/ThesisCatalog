@@ -38,7 +38,7 @@ public class CatalogService
                 Id = 1,
                 Memory = new MemorySpecification(8, StorageUnit.GB),
                 StorageSpecification = new StorageSpecification(1, StorageUnit.TB, StorageType.SSD),
-                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, int>
+                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, short>
                 {
                     { UsbType.USB3, 2 },
                     { UsbType.USB2, 4 }
@@ -56,7 +56,7 @@ public class CatalogService
                 Id = 2,
                 Memory = new MemorySpecification(16, StorageUnit.GB),
                 StorageSpecification = new StorageSpecification(2, StorageUnit.TB, StorageType.HDD),
-                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, int>
+                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, short>
                 {
                     { UsbType.USB3, 3 },
                     { UsbType.USB2, 4 }
@@ -80,7 +80,7 @@ public class CatalogService
                 Id = 3,
                 Memory = new MemorySpecification(16, StorageUnit.GB),
                 StorageSpecification = new StorageSpecification(3, StorageUnit.TB, StorageType.HDD),
-                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, int>
+                UsbSpecification = new UsbSpecification(new Dictionary<UsbType, short>
                 {
                     { UsbType.USB3, 4 },
                     { UsbType.USB2, 4 }

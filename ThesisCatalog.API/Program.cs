@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ThesisCatalog.API.Data;
+using ThesisCatalog.API.Services;
+using ThesisCatalog.Core.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ThesisCatalogDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ThesisCatalogDbContext"));
-});
+}, ServiceLifetime.Singleton, ServiceLifetime.Singleton);
+
+builder.Services.AddSingleton<CatalogService>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o => o.JsonSerializerOptions.TypeInfoResolverChain.Add(ThesisCatalogJsonSerializerContext.Default));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -56,8 +63,10 @@ static async Task CreateDbIfNotExists(IHost host)
     try
     {
         var context = services.GetRequiredService<ThesisCatalogDbContext>();
-        await context.Database.EnsureCreatedAsync();
         await context.Database.MigrateAsync();
+
+        var catalogService = services.GetRequiredService<CatalogService>();
+        await catalogService.SeedInitialData();
     }
     catch (Exception ex)
     {

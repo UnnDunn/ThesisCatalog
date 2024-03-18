@@ -5,6 +5,7 @@ namespace ThesisCatalog.Core.Entities;
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
 [JsonSerializable(typeof(ComponentDescriptor))]
 [JsonSerializable(typeof(ComponentManufacturer))]
+[JsonSerializable(typeof(List<ComponentManufacturer>))]
 [JsonSerializable(typeof(ComputerCatalogItem))]
 [JsonSerializable(typeof(List<ComputerCatalogItem>))]
 [JsonSerializable(typeof(MemorySpecification))]

@@ -30,18 +30,18 @@ namespace ThesisCatalog.API.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MemorySpecification_MemoryBytes = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    MemorySpecification_MemoryBytes = table.Column<long>(type: "bigint", nullable: false),
                     MemorySpecification_MemoryDisplayUnit = table.Column<int>(type: "int", nullable: false),
-                    StorageSpecification_StorageBytes = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    StorageSpecification_StorageBytes = table.Column<long>(type: "bigint", nullable: false),
                     StorageSpecification_StorageDisplayUnit = table.Column<int>(type: "int", nullable: false),
                     StorageSpecification_StorageType = table.Column<int>(type: "int", nullable: false),
-                    PsuRating = table.Column<long>(type: "bigint", nullable: false),
-                    Weight_WeightGrams = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    PsuRating = table.Column<short>(type: "smallint", nullable: false),
+                    Weight_WeightGrams = table.Column<long>(type: "bigint", nullable: false),
                     Weight_WeightDisplayUnit = table.Column<int>(type: "int", nullable: false),
                     CpuDescriptor_ManufacturerId = table.Column<int>(type: "int", nullable: false),
-                    CpuDescriptor_ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CpuDescriptor_ModelName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     GpuDescriptor_ManufacturerId = table.Column<int>(type: "int", nullable: false),
-                    GpuDescriptor_ModelName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    GpuDescriptor_ModelName = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -50,14 +50,12 @@ namespace ThesisCatalog.API.Data.Migrations
                         name: "FK_CatalogItems_Manufacturers_CpuDescriptor_ManufacturerId",
                         column: x => x.CpuDescriptor_ManufacturerId,
                         principalTable: "Manufacturers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CatalogItems_Manufacturers_GpuDescriptor_ManufacturerId",
                         column: x => x.GpuDescriptor_ManufacturerId,
                         principalTable: "Manufacturers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -66,7 +64,7 @@ namespace ThesisCatalog.API.Data.Migrations
                 {
                     CatalogItemId = table.Column<int>(type: "int", nullable: false),
                     UsbType = table.Column<int>(type: "int", nullable: false),
-                    PortCount = table.Column<int>(type: "int", nullable: false)
+                    PortCount = table.Column<short>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
                 {

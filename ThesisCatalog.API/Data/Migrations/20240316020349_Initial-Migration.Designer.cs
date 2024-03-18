@@ -11,8 +11,8 @@ using ThesisCatalog.API.Data;
 namespace ThesisCatalog.API.Data.Migrations
 {
     [DbContext(typeof(ThesisCatalogDbContext))]
-    [Migration("20240313202223_Remove-Unsigned-Types")]
-    partial class RemoveUnsignedTypes
+    [Migration("20240316020349_Initial-Migration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,8 +173,8 @@ namespace ThesisCatalog.API.Data.Migrations
                             b1.Property<int>("UsbType")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("PortCount")
-                                .HasColumnType("int");
+                            b1.Property<short>("PortCount")
+                                .HasColumnType("smallint");
 
                             b1.HasKey("CatalogItemId", "UsbType");
 

@@ -170,8 +170,8 @@ namespace ThesisCatalog.API.Data.Migrations
                             b1.Property<int>("UsbType")
                                 .HasColumnType("int");
 
-                            b1.Property<int>("PortCount")
-                                .HasColumnType("int");
+                            b1.Property<short>("PortCount")
+                                .HasColumnType("smallint");
 
                             b1.HasKey("CatalogItemId", "UsbType");
 

@@ -2,7 +2,7 @@ namespace ThesisCatalog.Core.Entities;
 
 public record MemorySpecification
 {
-    public ulong ByteQuantity { get; init; }
+    public long ByteQuantity { get; init; }
     public StorageUnit DisplayUnit { get; init; } = StorageUnit.GB;
 
     public MemorySpecification(uint quantity, StorageUnit displayUnit)
@@ -10,10 +10,18 @@ public record MemorySpecification
         var multiplier = Math.Pow(1024, (int)displayUnit);
         var byteQuantity = quantity * multiplier;
 
-        ByteQuantity = Convert.ToUInt64(Math.Round(byteQuantity));
+        ByteQuantity = Convert.ToInt64(Math.Round(byteQuantity));
         DisplayUnit = displayUnit;
     }
 
+    public MemorySpecification(long byteQuantity, StorageUnit displayUnit)
+    {
+        ByteQuantity = byteQuantity;
+        DisplayUnit = displayUnit;
+    }
+    
+    public MemorySpecification() {}
+    
     public override string ToString()
     {
         var divisor = Math.Pow(1024, (int)DisplayUnit);

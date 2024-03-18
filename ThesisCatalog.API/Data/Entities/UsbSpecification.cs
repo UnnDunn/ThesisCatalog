@@ -7,5 +7,5 @@ public record UsbSpecification
 {
     public int CatalogItemId { get; set; }
     public UsbType UsbType { get; set; }
-    public ushort PortCount { get; set; }
+    public short PortCount { get; set; }
 }

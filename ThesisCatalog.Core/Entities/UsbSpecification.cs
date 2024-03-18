@@ -4,12 +4,12 @@ namespace ThesisCatalog.Core.Entities;
 
 public record UsbSpecification
 {
-    public UsbSpecification(Dictionary<UsbType, int> usbPorts)
+    public UsbSpecification(Dictionary<UsbType, short> usbPorts)
     {
         UsbPorts = usbPorts;
     }
 
-    public Dictionary<UsbType, int> UsbPorts { get; set; }
+    public Dictionary<UsbType, short> UsbPorts { get; set; }
 
     public override string ToString()
     {
