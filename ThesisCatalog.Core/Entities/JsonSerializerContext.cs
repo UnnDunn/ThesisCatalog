@@ -14,6 +14,4 @@ namespace ThesisCatalog.Core.Entities;
 [JsonSerializable(typeof(UsbSpecification))]
 [JsonSerializable(typeof(List<UsbSpecification>))]
 [JsonSerializable(typeof(Dictionary<UsbType, int>))]
-public partial class ThesisCatalogJsonSerializerContext : JsonSerializerContext
-{
-}
+public partial class ThesisCatalogJsonSerializerContext : JsonSerializerContext;
