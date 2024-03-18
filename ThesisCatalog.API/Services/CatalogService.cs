@@ -18,6 +18,7 @@ public class CatalogService
 
     public async Task<List<ComputerCatalogItem>> GetAllCatalogItems()
     {
+        using var logScope = _logger.BeginScope("Getting all catalog items");
         var items = await _dbContext.CatalogItems
             .Include(i => i.Weight)
             .Include(i => i.MemorySpecification)
@@ -27,13 +28,16 @@ public class CatalogService
             .Include(i => i.GpuDescriptor.Manufacturer)
             .ToListAsync();
         
+        _logger.LogInformation("{itemCount} items found", items.Count);
         return items.Select(item => (ComputerCatalogItem)item)
             .ToList();
     }
 
     public async Task<List<ComponentManufacturer>> GetAllManufacturers()
     {
+        using var logScope = _logger.BeginScope("Getting all manufacturers");
         var manufacturers = await _dbContext.Manufacturers.ToListAsync();
+        _logger.LogInformation("{manufacturerCount} manufacturers found", manufacturers.Count);
         return manufacturers.Select(m => new ComponentManufacturer
         {
             Id = m.Id, Name = m.Name, ComponentType = m.ComponentTypes
