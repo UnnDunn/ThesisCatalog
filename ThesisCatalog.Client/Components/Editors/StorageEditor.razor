@@ -1,0 +1,56 @@
+@using ThesisCatalog.Core.Entities
+<FluentNumberField @bind-Value="StorageDisplayBytesValue" @bind-Value:after="StorageSpecificationChangedHandler"/>
+<FluentSelect Items="AvailableStorageUnitValues"
+              OptionValue="@(i => i.Value)"
+              OptionText="@(i => i.Text)"
+              @bind-SelectedOption="StorageDisplayUnitValue"
+              @bind-SelectedOption:after="StorageSpecificationChangedHandler" />
+<FluentSelect Items="AvailableStorageTypeValues"
+              OptionValue="@(i => i.Value)"
+              OptionText="@(i => i.Text)"
+              @bind-SelectedOption="StorageTypeValue"
+              @bind-SelectedOption:after="StorageSpecificationChangedHandler" />
+
+@code {
+    [Parameter] public StorageSpecification? StorageSpecification { get; set; }
+    [Parameter] public EventCallback<StorageSpecification> StorageSpecificationChanged { get; set; }
+    
+    private int StorageDisplayBytesValue { get; set; }
+    private Option<string>? StorageDisplayUnitValue { get; set; }
+    private Option<string>? StorageTypeValue { get; set; }
+
+    private List<Option<string>> AvailableStorageUnitValues =>
+    [
+        new Option<string> { Value = ((int)StorageUnit.kB).ToString(), Text = "kB" },
+        new Option<string> { Value = ((int)StorageUnit.MB).ToString(), Text = "MB" },
+        new Option<string> { Value = ((int)StorageUnit.GB).ToString(), Text = "GB", Selected = true },
+        new Option<string> { Value = ((int)StorageUnit.TB).ToString(), Text = "TB" },
+    ];
+
+    private List<Option<string>> AvailableStorageTypeValues =>
+    [
+        new Option<string> { Value = ((int)StorageType.HDD).ToString(), Text = "HDD" },
+        new Option<string> { Value = ((int)StorageType.SSD).ToString(), Text = "SSD", Selected = true }
+    ];
+
+    protected override void OnParametersSet()
+    {
+        if (StorageSpecification is null) return;
+        StorageDisplayBytesValue = StorageSpecification.DisplayQuantity;
+        
+        var storageUnitValue = ((int)StorageSpecification.DisplayUnit).ToString();
+        StorageDisplayUnitValue = AvailableStorageUnitValues.Single(s => s.Value == storageUnitValue);
+
+        var storageTypeValue = ((int)StorageSpecification.StorageType).ToString();
+        StorageTypeValue = AvailableStorageTypeValues.Single(s => s.Value == storageTypeValue);
+    }
+
+
+    private async Task StorageSpecificationChangedHandler()
+    {
+        var result = new StorageSpecification();
+
+        await StorageSpecificationChanged.InvokeAsync(result);
+    }
+
+}

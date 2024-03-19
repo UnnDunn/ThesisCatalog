@@ -8,6 +8,10 @@ public record StorageSpecification
     public StorageUnit DisplayUnit { get; init; }
     public StorageType StorageType { get; init; }
 
+    [JsonIgnore]
+    public int DisplayQuantity =>
+        (int)Math.Round(ByteQuantity / Math.Pow(1024, (int)DisplayUnit));
+
     public StorageSpecification(int quantity, StorageUnit displayUnit, StorageType type)
     {
         var multiplier = Math.Pow(1024, (int)displayUnit);

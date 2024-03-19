@@ -1,0 +1,46 @@
+@using ThesisCatalog.Core.Entities
+<FluentNumberField 
+    @bind-Value="StorageDisplayBytesValue"
+    @bind-Value:after="MemorySpecificationChangedHandler"
+    Label="Amount"
+    Placeholder="8"/>
+<FluentSelect 
+    @bind-SelectedOption="StorageDisplayUnitValue"
+    @bind-SelectedOption:after="MemorySpecificationChangedHandler"
+    Items="AvailableStorageDisplayUnitValues"
+    OptionText="@(i => i.Text)"
+    OptionValue="@(i => i.Value)" />
+@code {
+
+    [Parameter]
+    public MemorySpecification? MemorySpecification { get; set; }
+    
+    [Parameter]
+    public EventCallback<MemorySpecification> MemorySpecificationChanged { get; set; }
+    
+    protected int StorageDisplayBytesValue { get; set; }
+    protected Option<string>? StorageDisplayUnitValue { get; set; }
+
+    protected static List<Option<string>> AvailableStorageDisplayUnitValues =>
+    [
+        new Option<string> { Value = ((int)StorageUnit.kB).ToString(), Text = "kB" },
+        new Option<string> { Value = ((int)StorageUnit.MB).ToString(), Text = "MB"},
+        new Option<string> { Value = ((int)StorageUnit.GB).ToString(), Text = "GB" },
+        new Option<string> { Value = ((int)StorageUnit.TB).ToString(), Text = "TB" },
+    ];
+
+    protected override void OnParametersSet()
+    {
+        if (MemorySpecification is null) return;
+        StorageDisplayBytesValue = MemorySpecification.DisplayQuantity;
+        var storageUnitValue = ((int)MemorySpecification.DisplayUnit).ToString();
+        StorageDisplayUnitValue = AvailableStorageDisplayUnitValues.Single(v => v.Value == storageUnitValue);
+    }
+
+    private async Task MemorySpecificationChangedHandler()
+    {
+        if (StorageDisplayUnitValue is null) return;
+        var result = new MemorySpecification(StorageDisplayBytesValue, (StorageUnit)int.Parse(StorageDisplayUnitValue?.Value ?? "0"));
+        await MemorySpecificationChanged.InvokeAsync(result);
+    }
+}

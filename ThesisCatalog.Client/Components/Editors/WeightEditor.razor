@@ -1,0 +1,41 @@
+@using ThesisCatalog.Core.Entities
+<FluentNumberField
+    @bind-Value="WeightDisplayValue"
+    @bind-value:after="WeightValueChangedHandler"/>
+<FluentSelect 
+    Items="AvailableWeightUnits"
+    OptionValue="@(i => i.Value)"
+    OptionText="@(i => i.Text)"
+    @bind-SelectedOption="WeightUnitValue"
+    @bind-SelectedOption:after="WeightValueChangedHandler"/>
+
+@code {
+    private Weight? _weight;
+    [Parameter] public Weight Weight { get; set; } = null!;
+    [Parameter] public EventCallback<Weight> WeightChanged { get; set; }
+
+    private double WeightDisplayValue { get; set; }
+    private Option<string>? WeightUnitValue { get; set; }
+
+    private static List<Option<string>> AvailableWeightUnits =>
+    [
+        new Option<string>() { Value = ((int)WeightUnit.Grams).ToString(), Text = "g" },
+        new Option<string>() { Value = ((int)WeightUnit.Kilograms).ToString(), Text = "kg" },
+        new Option<string>() { Value = ((int)WeightUnit.Pounds).ToString(), Text = "lb" }
+    ];
+
+    protected override void OnParametersSet()
+    {
+        _weight = Weight;
+        WeightDisplayValue = _weight.DisplayValue;
+        var weightUnitValue = ((int)_weight.DisplayUnit).ToString();
+        WeightUnitValue = AvailableWeightUnits.Single(o => o.Value == weightUnitValue);
+    }
+
+    private async Task WeightValueChangedHandler()
+    {
+        _weight = new Weight(WeightDisplayValue, (WeightUnit)int.Parse(WeightUnitValue?.Value ?? "0"));
+        await WeightChanged.InvokeAsync(_weight);
+    }
+
+}

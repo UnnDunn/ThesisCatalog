@@ -7,7 +7,11 @@ public record MemorySpecification
     public long ByteQuantity { get; init; }
     public StorageUnit DisplayUnit { get; init; } = StorageUnit.GB;
 
-    public MemorySpecification(uint quantity, StorageUnit displayUnit)
+    [JsonIgnore]
+    public int DisplayQuantity =>
+        Convert.ToInt32(Math.Round(ByteQuantity / Math.Pow(1024, (int)DisplayUnit)));
+    
+    public MemorySpecification(int quantity, StorageUnit displayUnit)
     {
         var multiplier = Math.Pow(1024, (int)displayUnit);
         var byteQuantity = quantity * multiplier;

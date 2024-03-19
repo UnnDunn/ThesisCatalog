@@ -7,6 +7,15 @@ public record Weight
     private const double PoundsConversionFactor = 453.59237;
     public int Grams { get; set; }
     public WeightUnit DisplayUnit { get; set; }
+    
+    [JsonIgnore]
+    public double DisplayValue =>  DisplayUnit switch
+        {
+            WeightUnit.Grams => Grams,
+            WeightUnit.Kilograms => Grams / 1000d,
+            WeightUnit.Pounds => Math.Round(Grams / PoundsConversionFactor),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
     public Weight(double amount, WeightUnit displayUnit)
     {
