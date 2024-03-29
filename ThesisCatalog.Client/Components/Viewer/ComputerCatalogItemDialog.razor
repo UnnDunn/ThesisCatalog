@@ -1,0 +1,44 @@
+@using ThesisCatalog.Core.Entities
+@using ThesisCatalog.Client.Components.Editors
+@implements IDialogContentComponent<ComputerCatalogItem>
+<FluentDialogBody>
+    <h3>Catalog Item @Content.Id</h3>
+    <dl>
+        <div class="cpu-specification">
+            <dt>CPU</dt>
+            <dd><ComponentEditor @bind-ComponentDescriptor="Content.CpuDescriptor" ComponentType="ComponentType.Cpu" /></dd>
+        </div>
+        <div>
+            <dt>GPU</dt>
+            <dd><ComponentEditor @bind-ComponentDescriptor="Content.GpuDescriptor" ComponentType="ComponentType.Gpu" /></dd>
+        </div>
+        <div class="memory-specification">
+            <dt>Memory</dt>
+            <dd><MemoryEditor @bind-MemorySpecification="Content.Memory" /></dd>
+        </div>
+        <div>
+            <dt>Storage</dt>
+            <dd><StorageEditor @bind-StorageSpecification="Content.StorageSpecification" /></dd>
+        </div>
+        <div class="usb-ports">
+            <dt>USB Ports</dt>
+            <dd>@Content.UsbSpecification.ToString() (editing USB specification will come soon)</dd>
+        </div>
+        <div class="psu-rating">
+            <dt>PSU Rating</dt>
+            <dd>
+                <FluentNumberField TValue="short" bind-Value="Content.PsuRating" Min="50" Max="1500" Size="4"/>
+                Watts
+            </dd>
+        </div>
+        <div class="weight">
+            <dt>Weight</dt>
+            <dd><WeightEditor bind-Weight="Content.Weight" /></dd>
+        </div>
+    </dl>
+</FluentDialogBody>
+
+@code {
+    [Parameter]
+    public ComputerCatalogItem Content { get; set; }
+}

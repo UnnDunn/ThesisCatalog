@@ -1,56 +1,53 @@
 @using ThesisCatalog.Core.Entities
-<FluentNumberField @bind-Value="StorageDisplayBytesValue" @bind-Value:after="StorageSpecificationChangedHandler"/>
-<FluentSelect Items="AvailableStorageUnitValues"
-              OptionValue="@(i => i.Value)"
-              OptionText="@(i => i.Text)"
-              @bind-SelectedOption="StorageDisplayUnitValue"
-              @bind-SelectedOption:after="StorageSpecificationChangedHandler" />
-<FluentSelect Items="AvailableStorageTypeValues"
-              OptionValue="@(i => i.Value)"
-              OptionText="@(i => i.Text)"
-              @bind-SelectedOption="StorageTypeValue"
-              @bind-SelectedOption:after="StorageSpecificationChangedHandler" />
+@using BindAttributes = Microsoft.FluentUI.AspNetCore.Components.BindAttributes
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentNumberField @bind-Value="StorageDisplayBytesValue" 
+                       @bind-Value:after="StorageSpecificationChangedHandler" Size="4"/>
+    <FluentSelect TOption="string" 
+                  @bind-Value="@StorageDisplayUnit"
+                  @bind-Value:after="StorageSpecificationChangedHandler"
+                  Width="6em">
+        @foreach (var storageUnit in Enum.GetValues<StorageUnit>())
+        {
+            <FluentOption Value="@storageUnit.ToString()">@storageUnit.ToString()</FluentOption>
+        }
+    </FluentSelect>
+    <FluentSelect TOption="string"
+                  @bind-Value="StorageTypeString"
+                  @bind-Value:after="StorageSpecificationChangedHandler"
+                  Width="6em">
+        @foreach (var storageType in Enum.GetValues<StorageType>())
+        {
+            <FluentOption Value="@storageType.ToString()">
+                @storageType.ToString()
+            </FluentOption>
+        }
+    </FluentSelect>
+</FluentStack>
 
 @code {
     [Parameter] public StorageSpecification? StorageSpecification { get; set; }
     [Parameter] public EventCallback<StorageSpecification> StorageSpecificationChanged { get; set; }
     
     private int StorageDisplayBytesValue { get; set; }
-    private Option<string>? StorageDisplayUnitValue { get; set; }
-    private Option<string>? StorageTypeValue { get; set; }
-
-    private List<Option<string>> AvailableStorageUnitValues =>
-    [
-        new Option<string> { Value = ((int)StorageUnit.kB).ToString(), Text = "kB" },
-        new Option<string> { Value = ((int)StorageUnit.MB).ToString(), Text = "MB" },
-        new Option<string> { Value = ((int)StorageUnit.GB).ToString(), Text = "GB", Selected = true },
-        new Option<string> { Value = ((int)StorageUnit.TB).ToString(), Text = "TB" },
-    ];
-
-    private List<Option<string>> AvailableStorageTypeValues =>
-    [
-        new Option<string> { Value = ((int)StorageType.HDD).ToString(), Text = "HDD" },
-        new Option<string> { Value = ((int)StorageType.SSD).ToString(), Text = "SSD", Selected = true }
-    ];
+    private string StorageDisplayUnit { get; set; } = StorageUnit.GB.ToString();
+    private string StorageTypeString { get; set; } = StorageType.SSD.ToString();
 
     protected override void OnParametersSet()
     {
         if (StorageSpecification is null) return;
         StorageDisplayBytesValue = StorageSpecification.DisplayQuantity;
-        
-        var storageUnitValue = ((int)StorageSpecification.DisplayUnit).ToString();
-        StorageDisplayUnitValue = AvailableStorageUnitValues.Single(s => s.Value == storageUnitValue);
-
-        var storageTypeValue = ((int)StorageSpecification.StorageType).ToString();
-        StorageTypeValue = AvailableStorageTypeValues.Single(s => s.Value == storageTypeValue);
+        StorageDisplayUnit = StorageSpecification.DisplayUnit.ToString();
+        StorageTypeString = StorageSpecification.StorageType.ToString();
     }
 
 
     private async Task StorageSpecificationChangedHandler()
     {
-        var result = new StorageSpecification();
+        var result = new StorageSpecification(StorageDisplayBytesValue,
+            Enum.Parse<StorageUnit>(StorageDisplayUnit),
+            Enum.Parse<StorageType>(StorageTypeString));
 
         await StorageSpecificationChanged.InvokeAsync(result);
     }
-
 }

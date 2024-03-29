@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Microsoft.FluentUI.AspNetCore.Components;
 using ThesisCatalog.Core.Entities;
@@ -164,6 +165,18 @@ public class CatalogService
         else
         {
             throw new Exception("Failed to retrieve component manufacturers.");
+        }
+    }
+
+    public async Task PutEditedCatalogItem(ComputerCatalogItem editedCatalogItem)
+    {
+        var jsonString = JsonSerializer.Serialize(editedCatalogItem,
+            ThesisCatalogJsonSerializerContext.Default.ComputerCatalogItem);
+        var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+        var response = await _httpClient.PutAsync($"api/Catalog/items/{editedCatalogItem.Id}", httpContent);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to update catalog item with id {catalogItemId}. Status Code: {statusCode}.", editedCatalogItem.Id, response.StatusCode);
         }
     }
 }

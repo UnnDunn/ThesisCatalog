@@ -3,29 +3,30 @@
 @inject CatalogService CatalogService;
 @inject ILogger<ComponentEditor> Logger;
 
-<FluentCombobox 
-    Items="ValidManufacturers" 
-    OptionValue="@(i => i.Value)" 
-    OptionText="@(i => i.Text)" 
+<FluentCombobox
+    Items="ValidManufacturers"
+    OptionValue="@(i => i.Value)"
+    OptionText="@(i => i.Text)"
+    OptionSelected="@(i => i.Selected)"
     @bind-SelectedOption="SelectedManufacturer"
     @bind-SelectedOption:after="ComponentDescriptorChangeHandler"
-    Label="Manufacturer"/>
-<FluentTextField @bind-Value="ModelName" @bind-Value:after="ComponentDescriptorChangeHandler" Label="Model" />
+    Label="Manufacturer"
+    Width="10em"/>
+<FluentTextField @bind-Value="ModelName" @bind-Value:after="ComponentDescriptorChangeHandler" Label="Model" Size="15" />
 
 @code {
-    [Parameter]
-    public ComponentType ComponentType { get; set; }
+    [Parameter] public ComponentType ComponentType { get; set; }
 
     private ComponentDescriptor _componentDescriptor = new();
-    
+
     [Parameter] public EventCallback<ComponentDescriptor> ComponentDescriptorChanged { get; set; }
-    
+
     [Parameter] public ComponentDescriptor ComponentDescriptor { get; set; } = new();
 
     public Option<string>? SelectedManufacturer { get; set; }
     
     public string ModelName { get; set; } = string.Empty;
-    
+
     public List<Option<string>> ValidManufacturers { get; private set; } = [];
 
     protected override async Task OnParametersSetAsync()
@@ -40,8 +41,9 @@
         {
             Value = v.Id.ToString(),
             Text = v.Name,
-            Selected = v.Id == (_componentDescriptor?.Manufacturer.Id ?? 0)
+            Selected = v.Id == _componentDescriptor.Manufacturer.Id
         }));
+        ModelName = _componentDescriptor.ModelName;
     }
 
     private async Task ComponentDescriptorChangeHandler()
@@ -57,5 +59,4 @@
 
         await ComponentDescriptorChanged.InvokeAsync(_componentDescriptor);
     }
-
 }

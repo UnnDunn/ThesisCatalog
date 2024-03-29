@@ -1,8 +1,9 @@
 @page "/Catalog"
 @using ThesisCatalog.Core.Entities
 @using ThesisCatalog.Client.Services
-@using ThesisCatalog.Core.Extensions
+@using ThesisCatalog.Client.Components.Viewer
 @inject CatalogService CatalogService
+@inject IDialogService DialogService
 @inject ILogger<Catalog> Logger
 <PageTitle>Catalog</PageTitle>
 
@@ -10,7 +11,7 @@
 
 @if (DisplayCatalogItems is not null && DisplayCatalogItems.Any())
 {
-    <FluentDataGrid Items="@DisplayCatalogItems">
+    <FluentDataGrid @ref="CatalogItemGrid" Items="@DisplayCatalogItems" OnRowFocus="new EventCallback<FluentDataGridRow<ComputerCatalogItem>>()">
         <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
         <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage" />
         <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports" />
@@ -18,6 +19,9 @@
         <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts" />
         <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight" />
         <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU" />
+        <TemplateColumn>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
+        </TemplateColumn>
     </FluentDataGrid>
 }
 else
@@ -28,6 +32,10 @@ else
 @code {
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
     private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
+    private ComputerCatalogItem? PanelCatalogItem { get; set; }
+    private FluentDataGrid<ComputerCatalogItem> CatalogItemGrid;
+
+    private IDialogReference? _dialog;
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,9 +43,46 @@ else
         using var logScope = Logger.BeginScope("Getting catalog items from API");
         var catalogItems = await CatalogService.GetAllCatalogItemsAsync();
         Logger.LogInformation("{catalogItemCount} items found", catalogItems.Values.Count);
+        var manufacturers = await CatalogService.GetAllComponentManufacturersAsync();
         DisplayCatalogItems = catalogItems.Values.AsQueryable();
         AllCatalogItems = catalogItems;
         Logger.LogInformation("DisplayCatalogItems has {displayCatalogItemsCount} items", DisplayCatalogItems.Count());
         StateHasChanged();
     }
+
+    private async Task DisplaySelectedItemPanel(ComputerCatalogItem context)
+    {
+        Logger.LogInformation("Showing panel for catalog item id {itemId}", context.Id);
+        var dialogParameters = new DialogParameters<ComputerCatalogItem>
+        {
+            Title = $"Edit Catalog Item {context.Id}",
+            Alignment = HorizontalAlignment.Right,
+            PrimaryAction = "Save Changes",
+            SecondaryActionEnabled = false
+        };
+
+        _dialog = await DialogService.ShowPanelAsync<ComputerCatalogItemDialog>(context, dialogParameters);
+        DialogResult result = await _dialog.Result;
+        await HandlePanel(result);
+    }
+
+    private async Task HandlePanel(DialogResult result)
+    {
+        if (result.Cancelled)
+        {
+            Logger.LogInformation("Edit canceled");
+            return;
+        }
+
+        var editedCatalogItem = result.Data as ComputerCatalogItem;
+        if (editedCatalogItem is null)
+        {
+            Logger.LogError("Panel returned an incompatible item");
+            return;
+        }
+
+        await CatalogService.PutEditedCatalogItem(editedCatalogItem);
+        await CatalogItemGrid.RefreshDataAsync();
+    }
+
 }

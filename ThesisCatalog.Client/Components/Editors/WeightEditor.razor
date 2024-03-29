@@ -1,13 +1,15 @@
 @using ThesisCatalog.Core.Entities
-<FluentNumberField
-    @bind-Value="WeightDisplayValue"
-    @bind-Value:after="WeightValueChangedHandler"/>
-<FluentSelect 
-    Items="AvailableWeightUnits"
-    OptionValue="@(i => i.Value)"
-    OptionText="@(i => i.Text)"
-    @bind-SelectedOption="WeightUnitValue"
-    @bind-SelectedOption:after="WeightValueChangedHandler"/>
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentNumberField
+        @bind-Value="WeightDisplayValue"
+        @bind-Value:after="WeightValueChangedHandler" Size="4"/>
+    <FluentSelect
+        Items="AvailableWeightUnits"
+        OptionValue="@(i => i.Value)"
+        OptionText="@(i => i.Text)"
+        @bind-SelectedOption="WeightUnitValue"
+        @bind-SelectedOption:after="WeightValueChangedHandler" Width="5em"/>
+</FluentStack>
 
 @code {
     private Weight? _weight;
