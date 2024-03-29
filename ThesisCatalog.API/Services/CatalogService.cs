@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ThesisCatalog.API.Data;
 using ThesisCatalog.API.Data.Entities;
+using ThesisCatalog.API.Exceptions;
 using ThesisCatalog.Core.Entities;
 
 namespace ThesisCatalog.API.Services;
@@ -42,6 +43,53 @@ public class CatalogService
         {
             Id = m.Id, Name = m.Name, ComponentType = m.ComponentTypes
         }).ToList();
+    }
+    
+    public async Task<ComputerCatalogItem> GetCatalogItemById(int id)
+    {
+        try
+        {
+            var catalogItem = await _dbContext.CatalogItems.Include(i => i.Weight)
+                .Include(i => i.MemorySpecification)
+                .Include(i => i.StorageSpecification)
+                .Include(i => i.UsbSpecifications)
+                .Include(i => i.CpuDescriptor.Manufacturer)
+                .Include(i => i.GpuDescriptor.Manufacturer)
+                .FirstAsync(i => i.Id == id);
+            return (ComputerCatalogItem)catalogItem;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation exception getting catalog item with id {id}", id);
+            throw new NotFoundException($"Catalog item with id {id} was not found", ex);
+        }
+    }
+
+    public async Task EditCatalogItem(int id, ComputerCatalogItem editedItem)
+    {
+        var existingItem = await _dbContext.CatalogItems.FirstOrDefaultAsync(i => i.Id == id);
+        if (existingItem == null)
+        {
+            throw new NotFoundException($"Catalog item with ID {id} not found");
+        }
+        existingItem.MemorySpecification.MemoryBytes = editedItem.Memory.ByteQuantity;
+        existingItem.MemorySpecification.MemoryDisplayUnit = editedItem.Memory.DisplayUnit;
+        
+        existingItem.StorageSpecification.StorageBytes = editedItem.StorageSpecification.ByteQuantity;
+        existingItem.StorageSpecification.StorageDisplayUnit = editedItem.StorageSpecification.DisplayUnit;
+        existingItem.StorageSpecification.StorageType = editedItem.StorageSpecification.StorageType;
+        
+        existingItem.PsuRating = editedItem.PsuRating;
+        
+        existingItem.Weight.WeightGrams = editedItem.Weight.Grams;
+        existingItem.Weight.WeightDisplayUnit = editedItem.Weight.DisplayUnit;
+        
+        existingItem.CpuDescriptor.ManufacturerId = editedItem.CpuDescriptor.Manufacturer.Id;
+        existingItem.CpuDescriptor.ModelName = editedItem.CpuDescriptor.ModelName;
+        
+        existingItem.GpuDescriptor.ManufacturerId = editedItem.GpuDescriptor.Manufacturer.Id;
+        existingItem.GpuDescriptor.ModelName = editedItem.GpuDescriptor.ModelName;
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<ComputerCatalogItem> AddCatalogItem(ComputerCatalogItem item)

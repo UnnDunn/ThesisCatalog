@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using ThesisCatalog.API.Exceptions;
 using ThesisCatalog.API.Services;
+using ThesisCatalog.Core.Entities;
 
 namespace ThesisCatalog.API.Controllers;
 
@@ -23,6 +25,27 @@ public class CatalogController : ControllerBase
         _logger.LogInformation("Getting all catalog items");
         var items = await _catalogService.GetAllCatalogItems();
         return Ok(items);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> EditCatalogItem(int id, [FromBody] ComputerCatalogItem item)
+    {
+        try
+        {
+            await _catalogService.EditCatalogItem(id, item);
+            return Ok();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddCatalogItem(ComputerCatalogItem item)
+    {
+        var addedItem = await _catalogService.AddCatalogItem(item);
+        return Ok(addedItem);
     }
 
     [HttpGet("manufacturers")]
