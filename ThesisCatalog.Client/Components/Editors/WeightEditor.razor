@@ -4,11 +4,16 @@
         @bind-Value="WeightDisplayValue"
         @bind-Value:after="WeightValueChangedHandler" Size="4"/>
     <FluentSelect
-        Items="AvailableWeightUnits"
-        OptionValue="@(i => i.Value)"
-        OptionText="@(i => i.Text)"
-        @bind-SelectedOption="WeightUnitValue"
-        @bind-SelectedOption:after="WeightValueChangedHandler" Width="5em"/>
+        TOption="string"
+        @bind-Value="WeightUnitString"
+        @bind-Value:after="WeightValueChangedHandler" Width="10em">
+        @foreach (var weightUnit in Enum.GetValues<WeightUnit>())
+        {
+            <FluentOption Value="@weightUnit.ToString()">
+                @weightUnit.ToString()
+            </FluentOption>
+        }
+    </FluentSelect>
 </FluentStack>
 
 @code {
@@ -17,26 +22,18 @@
     [Parameter] public EventCallback<Weight> WeightChanged { get; set; }
 
     private double WeightDisplayValue { get; set; }
-    private Option<string>? WeightUnitValue { get; set; }
-
-    private static List<Option<string>> AvailableWeightUnits =>
-    [
-        new Option<string>() { Value = ((int)WeightUnit.Grams).ToString(), Text = "g" },
-        new Option<string>() { Value = ((int)WeightUnit.Kilograms).ToString(), Text = "kg" },
-        new Option<string>() { Value = ((int)WeightUnit.Pounds).ToString(), Text = "lb" }
-    ];
+    private string WeightUnitString { get; set; } = WeightUnit.Kilograms.ToString();
 
     protected override void OnParametersSet()
     {
         _weight = Weight;
         WeightDisplayValue = _weight.DisplayValue;
-        var weightUnitValue = ((int)_weight.DisplayUnit).ToString();
-        WeightUnitValue = AvailableWeightUnits.Single(o => o.Value == weightUnitValue);
+        WeightUnitString = _weight.DisplayUnit.ToString();
     }
 
     private async Task WeightValueChangedHandler()
     {
-        _weight = new Weight(WeightDisplayValue, (WeightUnit)int.Parse(WeightUnitValue?.Value ?? "0"));
+        _weight = new Weight(WeightDisplayValue, Enum.Parse<WeightUnit>(WeightUnitString));
         await WeightChanged.InvokeAsync(_weight);
     }
 

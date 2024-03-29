@@ -2,7 +2,6 @@
 @using ThesisCatalog.Client.Components.Editors
 @implements IDialogContentComponent<ComputerCatalogItem>
 <FluentDialogBody>
-    <h3>Catalog Item @Content.Id</h3>
     <dl>
         <div class="cpu-specification">
             <dt>CPU</dt>
@@ -33,7 +32,7 @@
         </div>
         <div class="weight">
             <dt>Weight</dt>
-            <dd><WeightEditor bind-Weight="Content.Weight" /></dd>
+            <dd><WeightEditor @bind-Weight="Content.Weight" /></dd>
         </div>
     </dl>
 </FluentDialogBody>
