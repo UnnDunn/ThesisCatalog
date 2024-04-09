@@ -27,7 +27,7 @@ public class CatalogController : ControllerBase
         return Ok(items);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("items/{id:int}")]
     public async Task<IActionResult> EditCatalogItem(int id, [FromBody] ComputerCatalogItem item)
     {
         try

@@ -1,4 +1,4 @@
-@page "/Catalog"
+@page "/"
 @using ThesisCatalog.Core.Entities
 @using ThesisCatalog.Client.Services
 @using ThesisCatalog.Client.Components.Viewer
@@ -9,44 +9,52 @@
 
 <h1>Catalog</h1>
 
-@if (DisplayCatalogItems is not null && DisplayCatalogItems.Any())
-{
-    <FluentDataGrid @ref="CatalogItemGrid" Items="@DisplayCatalogItems" OnRowFocus="new EventCallback<FluentDataGridRow<ComputerCatalogItem>>()">
-        <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
-        <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage" />
-        <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports" />
-        <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics" />
-        <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts" />
-        <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight" />
-        <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU" />
-        <TemplateColumn>
-            <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
-        </TemplateColumn>
+    <FluentDataGrid 
+        @ref="@_catalogItemGrid"
+        ItemsProvider="@_catalogItemsProvider"
+        ItemKey="item => item.Id">
+        <ChildContent>
+            <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
+            <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage"/>
+            <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
+            <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
+            <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts"/>
+            <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight"/>
+            <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
+            <TemplateColumn>
+                <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
+            </TemplateColumn>
+        </ChildContent>
+        <EmptyContent>
+            <p>No catalog items were found.</p>
+        </EmptyContent>
+        
     </FluentDataGrid>
-}
-else
-{
-    <p>No catalog items were found.</p>
-}
 
 @code {
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
     private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
     private ComputerCatalogItem? PanelCatalogItem { get; set; }
-    private FluentDataGrid<ComputerCatalogItem> CatalogItemGrid;
+    private FluentDataGrid<ComputerCatalogItem> _catalogItemGrid = null!;
+    
+    GridItemsProvider<ComputerCatalogItem> _catalogItemsProvider = default!;
 
     private IDialogReference? _dialog;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        using var logScope = Logger.BeginScope("Getting catalog items from API");
-        var catalogItems = await CatalogService.GetAllCatalogItemsAsync();
-        Logger.LogInformation("{catalogItemCount} items found", catalogItems.Values.Count);
+
+        _catalogItemsProvider = async req =>
+        {
+            using var logScope = Logger.BeginScope("Getting catalog items from API");
+            var itemsDictionary = await CatalogService.GetAllCatalogItemsAsync();
+            var items = itemsDictionary.Values.ToList();
+            Logger.LogInformation("{catalogItemCount} items found", items.Count);
+            return GridItemsProviderResult.From(items, items.Count);
+        };
+        
         var manufacturers = await CatalogService.GetAllComponentManufacturersAsync();
-        DisplayCatalogItems = catalogItems.Values.AsQueryable();
-        AllCatalogItems = catalogItems;
-        Logger.LogInformation("DisplayCatalogItems has {displayCatalogItemsCount} items", DisplayCatalogItems.Count());
         StateHasChanged();
     }
 
@@ -66,7 +74,7 @@ else
         await HandlePanel(result);
     }
 
-    private async Task HandlePanel(DialogResult result)
+    private async Task HandlePanel(DialogResult result, bool isEditing = true)
     {
         if (result.Cancelled)
         {
@@ -82,7 +90,6 @@ else
         }
 
         await CatalogService.PutEditedCatalogItem(editedCatalogItem);
-        await CatalogItemGrid.RefreshDataAsync();
+        await _catalogItemGrid.RefreshDataAsync();
     }
-
 }
