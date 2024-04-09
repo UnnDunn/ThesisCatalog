@@ -41,8 +41,8 @@ public class CatalogController : ControllerBase
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddCatalogItem(ComputerCatalogItem item)
+    [HttpPost("items")]
+    public async Task<IActionResult> AddCatalogItem([FromBody] ComputerCatalogItem item)
     {
         var addedItem = await _catalogService.AddCatalogItem(item);
         return Ok(addedItem);

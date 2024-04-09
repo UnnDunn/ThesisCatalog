@@ -8,28 +8,33 @@
 <PageTitle>Catalog</PageTitle>
 
 <h1>Catalog</h1>
-
-    <FluentDataGrid 
-        @ref="@_catalogItemGrid"
-        ItemsProvider="@_catalogItemsProvider"
-        ItemKey="item => item.Id">
-        <ChildContent>
-            <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
-            <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage"/>
-            <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
-            <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
-            <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts"/>
-            <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight"/>
-            <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
-            <TemplateColumn>
-                <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
-            </TemplateColumn>
-        </ChildContent>
-        <EmptyContent>
-            <p>No catalog items were found.</p>
-        </EmptyContent>
-        
-    </FluentDataGrid>
+<FluentToolbar>
+    <FluentButton IconStart="@(new Icons.Regular.Size20.New())"
+                  @onclick="DisplayCreateItemPanel">
+        Create Item
+    </FluentButton>
+</FluentToolbar>
+<FluentDataGrid 
+    @ref="@_catalogItemGrid"
+    ItemsProvider="@_catalogItemsProvider"
+    ItemKey="item => item.Id">
+    <ChildContent>
+        <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
+        <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage"/>
+        <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
+        <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
+        <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts"/>
+        <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight"/>
+        <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
+        <TemplateColumn>
+            <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
+        </TemplateColumn>
+    </ChildContent>
+    <EmptyContent>
+        <p>No catalog items were found.</p>
+    </EmptyContent>
+    
+</FluentDataGrid>
 
 @code {
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
@@ -58,18 +63,49 @@
         StateHasChanged();
     }
 
-    private async Task DisplaySelectedItemPanel(ComputerCatalogItem context)
+    private async Task DisplayCreateItemPanel()
     {
-        Logger.LogInformation("Showing panel for catalog item id {itemId}", context.Id);
+        Logger.LogInformation("Showing panel for new catalog item");
+        var newItem = new ComputerCatalogItem
+        {
+            CpuDescriptor = new ComponentDescriptor(),
+            GpuDescriptor = new ComponentDescriptor(),
+            Memory = new MemorySpecification((int)8, StorageUnit.GB),
+            StorageSpecification = new StorageSpecification((int)1, StorageUnit.TB, StorageType.SSD),
+            PsuRating = 500,
+            Weight = new Weight(350, WeightUnit.Grams),
+            UsbSpecification = new UsbSpecification(new Dictionary<UsbType, short>
+            {
+                { UsbType.USB3, 4 },
+                { UsbType.USBC, 4 }
+            })
+        };
         var dialogParameters = new DialogParameters<ComputerCatalogItem>
         {
-            Title = $"Edit Catalog Item {context.Id}",
+            Title = $"Create catalog item",
             Alignment = HorizontalAlignment.Right,
             PrimaryAction = "Save Changes",
             SecondaryActionEnabled = false
         };
 
-        _dialog = await DialogService.ShowPanelAsync<ComputerCatalogItemDialog>(context, dialogParameters);
+        _dialog = await DialogService.ShowPanelAsync<ComputerCatalogItemDialog>(newItem, dialogParameters);
+        DialogResult result = await _dialog.Result;
+        await HandlePanel(result, false);
+        
+    }
+    
+    private async Task DisplaySelectedItemPanel(ComputerCatalogItem selectedItem)
+    {
+        Logger.LogInformation("Showing panel for catalog item id {itemId}", selectedItem.Id);
+        var dialogParameters = new DialogParameters<ComputerCatalogItem>
+        {
+            Title = $"Edit Catalog Item {selectedItem.Id}",
+            Alignment = HorizontalAlignment.Right,
+            PrimaryAction = "Save Changes",
+            SecondaryActionEnabled = false
+        };
+
+        _dialog = await DialogService.ShowPanelAsync<ComputerCatalogItemDialog>(selectedItem, dialogParameters);
         DialogResult result = await _dialog.Result;
         await HandlePanel(result);
     }
@@ -78,18 +114,25 @@
     {
         if (result.Cancelled)
         {
-            Logger.LogInformation("Edit canceled");
+            Logger.LogInformation("Panel processing canceled");
             return;
         }
 
-        var editedCatalogItem = result.Data as ComputerCatalogItem;
-        if (editedCatalogItem is null)
+        if (result.Data is not ComputerCatalogItem editedCatalogItem)
         {
             Logger.LogError("Panel returned an incompatible item");
             return;
         }
 
-        await CatalogService.PutEditedCatalogItem(editedCatalogItem);
+        if (isEditing)
+        {
+            await CatalogService.PutEditedCatalogItem(editedCatalogItem);
+        }
+        else
+        {
+            await CatalogService.PostCreatedCatalogItem(editedCatalogItem);
+        }
+
         await _catalogItemGrid.RefreshDataAsync();
     }
 }

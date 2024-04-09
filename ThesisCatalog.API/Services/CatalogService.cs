@@ -95,6 +95,9 @@ public class CatalogService
     public async Task<ComputerCatalogItem> AddCatalogItem(ComputerCatalogItem item)
     {
         var dbCatalogItem = (CatalogItem)item;
+
+        var manufacturers = await _dbContext.Manufacturers.ToDictionaryAsync(m => m.Id);
+        
         _dbContext.CatalogItems.Add(dbCatalogItem);
         await _dbContext.SaveChangesAsync();
         

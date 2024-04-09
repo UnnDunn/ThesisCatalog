@@ -179,4 +179,15 @@ public class CatalogService
             _logger.LogError("Failed to update catalog item with id {catalogItemId}. Status Code: {statusCode}.", editedCatalogItem.Id, response.StatusCode);
         }
     }
+
+    public async Task PostCreatedCatalogItem(ComputerCatalogItem newItem)
+    {
+        var jsonString = JsonSerializer.Serialize(newItem, ThesisCatalogJsonSerializerContext.Default.ComputerCatalogItem);
+        var httpContent = new StringContent(jsonString, Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync("api/Catalog/items", httpContent);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to create catalog item. Status Code: {statusCode}.", response.StatusCode);
+        }
+    }
 }

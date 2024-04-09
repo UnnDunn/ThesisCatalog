@@ -41,7 +41,7 @@
         {
             Value = v.Id.ToString(),
             Text = v.Name,
-            Selected = v.Id == _componentDescriptor.Manufacturer.Id
+            Selected = v.Id == _componentDescriptor.Manufacturer?.Id
         }));
         ModelName = _componentDescriptor.ModelName;
     }
@@ -54,6 +54,7 @@
             SelectedManufacturer.Value,
             ModelName);
         _componentDescriptor.ModelName = ModelName;
+        _componentDescriptor.Manufacturer ??= new ComponentManufacturer();
         _componentDescriptor.Manufacturer.Id = int.Parse(SelectedManufacturer.Value);
         _componentDescriptor.Manufacturer.Name = SelectedManufacturer.Text;
 

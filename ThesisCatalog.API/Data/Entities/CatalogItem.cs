@@ -87,26 +87,14 @@ public record CatalogItem
             CpuDescriptor =
                 new ComponentDescriptor
                 {
-                    Manufacturer =
-                        new Manufacturer
-                        {
-                            Id = item.CpuDescriptor.Manufacturer.Id,
-                            Name = item.CpuDescriptor.Manufacturer.Name,
-                            ComponentTypes = item.CpuDescriptor.Manufacturer.ComponentType
-                        },
-                    ModelName = item.CpuDescriptor.ModelName
+                    ModelName = item.CpuDescriptor.ModelName,
+                    ManufacturerId = item.CpuDescriptor.Manufacturer?.Id ?? 0
                 },
             GpuDescriptor =
                 new ComponentDescriptor
                 {
-                    Manufacturer =
-                        new Manufacturer
-                        {
-                            Id = item.GpuDescriptor.Manufacturer.Id,
-                            Name = item.GpuDescriptor.Manufacturer.Name,
-                            ComponentTypes = item.GpuDescriptor.Manufacturer.ComponentType
-                        },
-                    ModelName = item.GpuDescriptor.ModelName
+                    ModelName = item.GpuDescriptor.ModelName,
+                    ManufacturerId = item.GpuDescriptor.Manufacturer?.Id ?? 0
                 },
             UsbSpecifications =
                 item.UsbSpecification.UsbPorts
