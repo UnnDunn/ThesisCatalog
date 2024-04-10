@@ -72,23 +72,27 @@ public class CatalogService
         {
             throw new NotFoundException($"Catalog item with ID {id} not found");
         }
-        existingItem.MemorySpecification.MemoryBytes = editedItem.Memory.ByteQuantity;
-        existingItem.MemorySpecification.MemoryDisplayUnit = editedItem.Memory.DisplayUnit;
+
+        var editedDataItem = (CatalogItem)editedItem;
+        existingItem.MemorySpecification.MemoryBytes = editedDataItem.MemorySpecification.MemoryBytes;
+        existingItem.MemorySpecification.MemoryDisplayUnit = editedDataItem.MemorySpecification.MemoryDisplayUnit;
         
-        existingItem.StorageSpecification.StorageBytes = editedItem.StorageSpecification.ByteQuantity;
-        existingItem.StorageSpecification.StorageDisplayUnit = editedItem.StorageSpecification.DisplayUnit;
-        existingItem.StorageSpecification.StorageType = editedItem.StorageSpecification.StorageType;
+        existingItem.StorageSpecification.StorageBytes = editedDataItem.StorageSpecification.StorageBytes;
+        existingItem.StorageSpecification.StorageDisplayUnit = editedDataItem.StorageSpecification.StorageDisplayUnit;
+        existingItem.StorageSpecification.StorageType = editedDataItem.StorageSpecification.StorageType;
         
-        existingItem.PsuRating = editedItem.PsuRating;
+        existingItem.PsuRating = editedDataItem.PsuRating;
         
-        existingItem.Weight.WeightGrams = editedItem.Weight.Grams;
-        existingItem.Weight.WeightDisplayUnit = editedItem.Weight.DisplayUnit;
+        existingItem.Weight.WeightGrams = editedDataItem.Weight.WeightGrams;
+        existingItem.Weight.WeightDisplayUnit = editedDataItem.Weight.WeightDisplayUnit;
         
-        existingItem.CpuDescriptor.ManufacturerId = editedItem.CpuDescriptor.Manufacturer.Id;
-        existingItem.CpuDescriptor.ModelName = editedItem.CpuDescriptor.ModelName;
+        existingItem.CpuDescriptor.ManufacturerId = editedDataItem.CpuDescriptor.ManufacturerId;
+        existingItem.CpuDescriptor.ModelName = editedDataItem.CpuDescriptor.ModelName;
         
-        existingItem.GpuDescriptor.ManufacturerId = editedItem.GpuDescriptor.Manufacturer.Id;
-        existingItem.GpuDescriptor.ModelName = editedItem.GpuDescriptor.ModelName;
+        existingItem.GpuDescriptor.ManufacturerId = editedDataItem.GpuDescriptor.ManufacturerId;
+        existingItem.GpuDescriptor.ModelName = editedDataItem.GpuDescriptor.ModelName;
+
+        existingItem.SearchText = editedDataItem.SearchText;
         await _dbContext.SaveChangesAsync();
     }
 

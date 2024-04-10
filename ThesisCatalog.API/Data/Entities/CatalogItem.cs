@@ -15,7 +15,9 @@ public record CatalogItem
     public ComponentDescriptor GpuDescriptor { get; set; } = null!;
     
     [NotMapped]
-    public  ICollection<UsbSpecification> UsbSpecifications { get; set; } = null!;
+    public ICollection<UsbSpecification> UsbSpecifications { get; set; } = null!;
+
+    public string SearchText { get; set; } = string.Empty;
 
     public static explicit operator ComputerCatalogItem(CatalogItem item) =>
         new()
@@ -99,6 +101,15 @@ public record CatalogItem
             UsbSpecifications =
                 item.UsbSpecification.UsbPorts
                     .Select(u => new UsbSpecification { UsbType = u.Key, PortCount = u.Value })
-                    .ToList()
+                    .ToList(),
+            SearchText = $"""
+                          "
+                          {item.CpuDescriptor}
+                          {item.GpuDescriptor}
+                          {item.StorageSpecification}
+                          {item.Memory}
+                          {item.UsbSpecification}
+                          "
+                          """
         };
 }
