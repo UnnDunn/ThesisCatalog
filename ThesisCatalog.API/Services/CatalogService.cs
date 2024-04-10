@@ -35,6 +35,23 @@ public class CatalogService
             .ToList();
     }
 
+    public async Task<List<ComputerCatalogItem>> GetCatalogItemsBySearchText(string searchText)
+    {
+        using var logScope = _logger.BeginScope("Getting catalog items matching search text {searchText}", searchText);
+        var items = await _dbContext.CatalogItems
+            .Include(i => i.Weight)
+            .Include(i => i.MemorySpecification)
+            .Include(i => i.StorageSpecification)
+            .Include(i => i.UsbSpecifications)
+            .Include(i => i.CpuDescriptor.Manufacturer)
+            .Include(i => i.GpuDescriptor.Manufacturer)
+            .Where(i => i.SearchText.Contains(searchText))
+            .AsNoTracking()
+            .ToListAsync();
+        _logger.LogInformation("{itemCount} items found", items.Count);
+        return items.Select(item => (ComputerCatalogItem)item).ToList();
+    }
+
     public async Task<List<ComponentManufacturer>> GetAllManufacturers()
     {
         using var logScope = _logger.BeginScope("Getting all manufacturers");
@@ -66,6 +83,8 @@ public class CatalogService
             throw new NotFoundException($"Catalog item with id {id} was not found", ex);
         }
     }
+    
+    
 
     public async Task EditCatalogItem(int id, ComputerCatalogItem editedItem)
     {
