@@ -41,6 +41,20 @@ public class CatalogController : ControllerBase
         }
     }
 
+    [HttpDelete("items/{id:int}")]
+    public async Task<IActionResult> DeleteCatalogItem(int id)
+    {
+        try
+        {
+            await _catalogService.RemoveCatalogItem(id);
+            return Ok();
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+    }
+
     [HttpPost("items")]
     public async Task<IActionResult> AddCatalogItem([FromBody] ComputerCatalogItem item)
     {

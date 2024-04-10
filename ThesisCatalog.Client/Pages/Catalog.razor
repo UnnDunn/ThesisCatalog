@@ -7,34 +7,39 @@
 @inject ILogger<Catalog> Logger
 <PageTitle>Catalog</PageTitle>
 
-<h1>Catalog</h1>
-<FluentToolbar>
-    <FluentButton IconStart="@(new Icons.Regular.Size20.New())"
-                  @onclick="DisplayCreateItemPanel">
-        Create Item
-    </FluentButton>
-</FluentToolbar>
-<FluentDataGrid 
-    @ref="@_catalogItemGrid"
-    ItemsProvider="@_catalogItemsProvider"
-    ItemKey="item => item.Id">
-    <ChildContent>
-        <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory"/>
-        <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage"/>
-        <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
-        <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
-        <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts"/>
-        <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight"/>
-        <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
-        <TemplateColumn>
-            <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
-        </TemplateColumn>
-    </ChildContent>
-    <EmptyContent>
-        <p>No catalog items were found.</p>
-    </EmptyContent>
-    
-</FluentDataGrid>
+    <FluentToolbar>
+        <FluentButton IconStart="@(new Icons.Regular.Size20.New())"
+                      @onclick="DisplayCreateItemPanel">
+            Create Item
+        </FluentButton>
+    </FluentToolbar>
+<FluentGrid>
+    <FluentGridItem>
+        <FluentDataGrid
+            @ref="@_catalogItemGrid"
+            ItemsProvider="@_catalogItemsProvider"
+            ItemKey="item => item.Id"
+            GridTemplateColumns="0.5fr 0.5fr 1fr 1fr 0.5fr 0.5fr 1fr">
+            <ChildContent>
+                <PropertyColumn Property="@(item => item.Memory.ToString())" Title="Memory" Align="Align.End"/>
+                <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage" Align="Align.End"/>
+                <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
+                <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
+                <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts" Align="Align.End"/>
+                <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight" Align="Align.End"/>
+                <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
+                <TemplateColumn>
+                    <FluentButton IconStart="@(new Icons.Regular.Size20.Edit())" @onclick="() => DisplaySelectedItemPanel(context)"/>
+                    <FluentButton IconStart="@(new Icons.Regular.Size20.Delete())" @onclick="() => DisplayDeleteItemConfirmation(context)" />
+                </TemplateColumn>
+            </ChildContent>
+            <EmptyContent>
+                <p>No catalog items were found.</p>
+            </EmptyContent>
+
+        </FluentDataGrid>
+    </FluentGridItem>
+    </FluentGrid>
 
 @code {
     private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
@@ -92,6 +97,30 @@
         DialogResult result = await _dialog.Result;
         await HandlePanel(result, false);
         
+    }
+
+    private async Task DisplayDeleteItemConfirmation(ComputerCatalogItem selectedItem)
+    {
+        Logger.LogInformation("Showing delete confirmation for catalog item id {itemId}", selectedItem.Id);
+        var confirmationMessage =
+            $@"""
+            This will delete the catalog item {selectedItem.Id} with the following components:
+            CPU: {selectedItem.CpuDescriptor},
+            GPU: {selectedItem.GpuDescriptor},
+            Memory: {selectedItem.Memory},
+            Storage: {selectedItem.StorageSpecification}
+            """;
+        _dialog = await DialogService.ShowConfirmationAsync(confirmationMessage,
+            $"Delete this item",
+            "Cancel",
+            "Delete this item?");
+        var result = await _dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            await CatalogService.DeleteCatalogItem(selectedItem);
+            await _catalogItemGrid.RefreshDataAsync();
+        }
     }
     
     private async Task DisplaySelectedItemPanel(ComputerCatalogItem selectedItem)

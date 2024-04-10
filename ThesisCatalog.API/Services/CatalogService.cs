@@ -104,6 +104,17 @@ public class CatalogService
         return (ComputerCatalogItem)dbCatalogItem;
     }
 
+    public async Task RemoveCatalogItem(int id)
+    {
+        var catalogItem = await _dbContext.CatalogItems.FindAsync(id);
+        if (catalogItem is null)
+        {
+            throw new NotFoundException($"Catalog item with ID {id} not found");
+        }
+        _dbContext.CatalogItems.Remove(catalogItem);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<int> AddCatalogItems(IEnumerable<ComputerCatalogItem> items)
     {
         var dbCatalogItems = items.Select(item => (CatalogItem)item).ToList();

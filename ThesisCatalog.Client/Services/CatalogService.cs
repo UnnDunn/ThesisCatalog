@@ -190,4 +190,14 @@ public class CatalogService
             _logger.LogError("Failed to create catalog item. Status Code: {statusCode}.", response.StatusCode);
         }
     }
+
+    public async Task DeleteCatalogItem(ComputerCatalogItem item)
+    {
+        var response = await _httpClient.DeleteAsync($"api/Catalog/items/{item.Id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError("Failed to delete catalog item with id {catalogItemId}. Status Code: {statusCode}.",
+                item.Id, response.StatusCode);
+        }
+    }
 }
