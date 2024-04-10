@@ -27,6 +27,7 @@ public class CatalogService
             .Include(i => i.UsbSpecifications)
             .Include(i => i.CpuDescriptor.Manufacturer)
             .Include(i => i.GpuDescriptor.Manufacturer)
+            .AsNoTracking()
             .ToListAsync();
         
         _logger.LogInformation("{itemCount} items found", items.Count);
@@ -37,7 +38,7 @@ public class CatalogService
     public async Task<List<ComponentManufacturer>> GetAllManufacturers()
     {
         using var logScope = _logger.BeginScope("Getting all manufacturers");
-        var manufacturers = await _dbContext.Manufacturers.ToListAsync();
+        var manufacturers = await _dbContext.Manufacturers.AsNoTracking().ToListAsync();
         _logger.LogInformation("{manufacturerCount} manufacturers found", manufacturers.Count);
         return manufacturers.Select(m => new ComponentManufacturer
         {
@@ -49,7 +50,8 @@ public class CatalogService
     {
         try
         {
-            var catalogItem = await _dbContext.CatalogItems.Include(i => i.Weight)
+            var catalogItem = await _dbContext.CatalogItems
+                .Include(i => i.Weight)
                 .Include(i => i.MemorySpecification)
                 .Include(i => i.StorageSpecification)
                 .Include(i => i.UsbSpecifications)
@@ -67,7 +69,14 @@ public class CatalogService
 
     public async Task EditCatalogItem(int id, ComputerCatalogItem editedItem)
     {
-        var existingItem = await _dbContext.CatalogItems.FirstOrDefaultAsync(i => i.Id == id);
+        var existingItem = await _dbContext.CatalogItems
+            .Include(i => i.Weight)
+            .Include(i => i.MemorySpecification)
+            .Include(i => i.StorageSpecification)
+            .Include(i => i.UsbSpecifications)
+            .Include(i => i.CpuDescriptor.Manufacturer)
+            .Include(i => i.GpuDescriptor.Manufacturer)
+            .FirstOrDefaultAsync(i => i.Id == id);
         if (existingItem == null)
         {
             throw new NotFoundException($"Catalog item with ID {id} not found");

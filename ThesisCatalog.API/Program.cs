@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ThesisCatalog.API.Data;
+using ThesisCatalog.API.Data.Helpers;
 using ThesisCatalog.API.Services;
 using ThesisCatalog.Core.Entities;
 
@@ -10,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ThesisCatalogDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ThesisCatalogDbContext"));
+    options.AddInterceptors(new SetSearchTextInterceptor());
 }, ServiceLifetime.Singleton, ServiceLifetime.Singleton);
 
 builder.Services.AddSingleton<CatalogService>();
