@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ThesisCatalog.API.Data;
 
@@ -10,9 +11,11 @@ using ThesisCatalog.API.Data;
 namespace ThesisCatalog.API.Data.Migrations
 {
     [DbContext(typeof(ThesisCatalogDbContext))]
-    partial class ThesisCatalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240410205112_Add-SearchTextColumn")]
+    partial class AddSearchTextColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
