@@ -32,13 +32,11 @@ public class SetSearchTextInterceptor : SaveChangesInterceptor
             var catalogItemDataEntity = entry.Entity;
             var catalogItem = (ComputerCatalogItem)catalogItemDataEntity;
             catalogItemDataEntity.SearchText = $"""
-                                      "
                                       {catalogItem.CpuDescriptor}
                                       {catalogItem.GpuDescriptor}
                                       {catalogItem.StorageSpecification}
                                       {catalogItem.Memory}
                                       {catalogItem.UsbSpecification}
-                                      "
                                       """;
         }
     }

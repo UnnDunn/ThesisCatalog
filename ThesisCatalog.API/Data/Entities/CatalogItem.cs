@@ -101,15 +101,6 @@ public record CatalogItem
             UsbSpecifications =
                 item.UsbSpecification.UsbPorts
                     .Select(u => new UsbSpecification { UsbType = u.Key, PortCount = u.Value })
-                    .ToList(),
-            SearchText = $"""
-                          "
-                          {item.CpuDescriptor}
-                          {item.GpuDescriptor}
-                          {item.StorageSpecification}
-                          {item.Memory}
-                          {item.UsbSpecification}
-                          "
-                          """
+                    .ToList()
         };
 }
