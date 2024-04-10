@@ -27,6 +27,13 @@ public class CatalogController : ControllerBase
         return Ok(items);
     }
 
+    [HttpPost("items/refresh")]
+    public async Task<IActionResult> RefreshAllCatalogItems()
+    {
+        var rowCount = await _catalogService.RefreshAllCatalogItems();
+        return Ok(rowCount);
+    }
+
     [HttpPut("items/{id:int}")]
     public async Task<IActionResult> EditCatalogItem(int id, [FromBody] ComputerCatalogItem item)
     {

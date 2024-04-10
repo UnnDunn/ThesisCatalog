@@ -105,6 +105,26 @@ public class CatalogService
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task<int> RefreshAllCatalogItems()
+    {
+        var catalogItems = await _dbContext.CatalogItems
+            .Include(i => i.Weight)
+            .Include(i => i.MemorySpecification)
+            .Include(i => i.StorageSpecification)
+            .Include(i => i.UsbSpecifications)
+            .Include(i => i.CpuDescriptor.Manufacturer)
+            .Include(i => i.GpuDescriptor.Manufacturer)
+            .ToListAsync();
+        var entityEntries = _dbContext.ChangeTracker.Entries<CatalogItem>();
+        foreach (var entry in entityEntries)
+        {
+            entry.State = EntityState.Modified;
+        }
+
+        var rowCount = await _dbContext.SaveChangesAsync();
+        return rowCount;
+    }
+
     public async Task<ComputerCatalogItem> AddCatalogItem(ComputerCatalogItem item)
     {
         var dbCatalogItem = (CatalogItem)item;
