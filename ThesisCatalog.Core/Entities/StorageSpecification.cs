@@ -35,7 +35,7 @@ public record StorageSpecification
     public override string ToString()
     {
         var divisor = Math.Pow(1024, (int)DisplayUnit);
-        var quantity = ByteQuantity / divisor;
+        var quantity = Convert.ToInt32(Math.Round(ByteQuantity / divisor));
         
         var storageType = StorageType switch
         {
@@ -52,6 +52,6 @@ public record StorageSpecification
             StorageUnit.MB => "MB",
             _ => string.Empty
         };
-        return $"{quantity:N}{suffix} {storageType}";
+        return $"{quantity}{suffix} {storageType}";
     }
 }

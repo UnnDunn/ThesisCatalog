@@ -32,7 +32,7 @@ public record MemorySpecification
     public override string ToString()
     {
         var divisor = Math.Pow(1024, (int)DisplayUnit);
-        var quantity = ByteQuantity / divisor;
+        var quantity = Convert.ToInt32(Math.Round(ByteQuantity / divisor));
         
         var suffix = DisplayUnit switch
         {
@@ -42,6 +42,6 @@ public record MemorySpecification
             StorageUnit.MB => "MB",
             _ => string.Empty
         };
-        return $"{quantity:N}{suffix}";
+        return $"{quantity} {suffix}";
     }
 }

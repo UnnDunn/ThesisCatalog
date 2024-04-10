@@ -57,8 +57,8 @@ public record Weight
         Func<double, int> conversionFunction = fromUnit switch
         {
             WeightUnit.Pounds => PoundsToGrams,
-            WeightUnit.Kilograms => d => Convert.ToInt16(Math.Round(d * 1000)),
-            WeightUnit.Grams => d => Convert.ToInt16(Math.Round(d)),
+            WeightUnit.Kilograms => d => Convert.ToInt32(Math.Round(d * 1000)),
+            WeightUnit.Grams => d => Convert.ToInt32(Math.Round(d)),
         };
 
         return conversionFunction.Invoke(amount);
@@ -67,6 +67,6 @@ public record Weight
     private static int PoundsToGrams(double amount)
     {
         var result = amount * PoundsConversionFactor;
-        return Convert.ToInt16(Math.Round(result));
+        return Convert.ToInt32(Math.Round(result));
     }
 }
