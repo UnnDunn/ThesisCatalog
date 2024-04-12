@@ -146,6 +146,23 @@ public class CatalogService
         }
     }
 
+    public async Task<Dictionary<int, ComputerCatalogItem>> GetCatalogItemsBySearchTextAsync(string searchText)
+    {
+        var response = await _httpClient.GetAsync($"api/Catalog/items/{searchText}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var catalogItems = JsonSerializer.Deserialize(content,
+                ThesisCatalogJsonSerializerContext.Default.ListComputerCatalogItem);
+            _logger.LogInformation("{catalogItemCount} items retrieved", catalogItems?.Count ?? 0);
+            return catalogItems?.ToDictionary(c => c.Id) ?? new Dictionary<int, ComputerCatalogItem>();
+        }
+        else
+        {
+            throw new Exception("Failed to retrieve catalog items.");
+        }
+    }
+
     public async Task<Dictionary<int, ComponentManufacturer>> GetAllComponentManufacturersAsync()
     {
         if (Manufacturers.Count != 0) return Manufacturers.ToDictionary(m => m.Id);

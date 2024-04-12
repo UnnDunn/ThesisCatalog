@@ -27,6 +27,14 @@ public class CatalogController : ControllerBase
         return Ok(items);
     }
 
+    [HttpGet("items/{searchText:alpha}")]
+    public async Task<IActionResult> GetCatalogItemsBySearchText(string searchText)
+    {
+        _logger.LogInformation("Getting catalog items matching search text '{searchText}'", searchText);
+        var items = await _catalogService.GetCatalogItemsBySearchText(searchText);
+        return Ok(items);
+    }
+
     [HttpPost("items/refresh")]
     public async Task<IActionResult> RefreshAllCatalogItems()
     {
