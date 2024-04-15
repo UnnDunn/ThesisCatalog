@@ -146,9 +146,11 @@ public class CatalogService
         }
     }
 
-    public async Task<Dictionary<int, ComputerCatalogItem>> GetCatalogItemsBySearchTextAsync(string searchText)
+    public async Task<Dictionary<int, ComputerCatalogItem>> GetCatalogItemsBySearchTextAsync(string searchTerm)
     {
-        var response = await _httpClient.GetAsync($"api/Catalog/items/{searchText}");
+        using var logScope =
+            _logger.BeginScope("Getting catalog results from API with search term {searchTerm}", searchTerm);
+        var response = await _httpClient.GetAsync($"api/Catalog/items/{searchTerm}");
         if (response.IsSuccessStatusCode)
         {
             var content = await response.Content.ReadAsStringAsync();

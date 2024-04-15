@@ -2,6 +2,7 @@
 @using ThesisCatalog.Core.Entities
 @using ThesisCatalog.Client.Services
 @using ThesisCatalog.Client.Components.Viewer
+@using System.Timers
 @inject CatalogService CatalogService
 @inject IDialogService DialogService
 @inject ILogger<Catalog> Logger
@@ -12,6 +13,12 @@
                       @onclick="DisplayCreateItemPanel">
             Create Item
         </FluentButton>
+        <FluentSearch 
+            @ref="@_searchTextField"
+            @bind-value="@SearchValue"
+            @bind-value:after="@HandleSearchClear"
+            @oninput="@(e => SearchValue = e.Value?.ToString())"
+            Placeholder="Find a laptop"/>
     </FluentToolbar>
 <FluentGrid>
     <FluentGridItem>
@@ -25,7 +32,7 @@
                 <PropertyColumn Property="@(item => item.StorageSpecification.ToString())" Title="Storage" Align="Align.End"/>
                 <PropertyColumn Property="@(item => item.UsbSpecification.ToString())" Title="USB Ports"/>
                 <PropertyColumn Property="@(item => item.GpuDescriptor.ToString())" Title="Graphics"/>
-                <PropertyColumn Property="@(item => item.PsuRating)" Title="PSU Watts" Align="Align.End"/>
+                <PropertyColumn Property="@(item => item.PsuRating)" Format="#####W" Title="PSU" Align="Align.End"/>
                 <PropertyColumn Property="@(item => item.Weight.ToString())" Title="Weight" Align="Align.End"/>
                 <PropertyColumn Property="@(item => item.CpuDescriptor.ToString())" Title="CPU"/>
                 <TemplateColumn>
@@ -42,11 +49,46 @@
     </FluentGrid>
 
 @code {
-    private Dictionary<int, ComputerCatalogItem> AllCatalogItems { get; set; } = new();
-    private IQueryable<ComputerCatalogItem>? DisplayCatalogItems { get; set; }
-    private ComputerCatalogItem? PanelCatalogItem { get; set; }
     private FluentDataGrid<ComputerCatalogItem> _catalogItemGrid = null!;
+
+
+    private FluentSearch? _searchTextField;
+    private Timer? _searchTimer = null;
     
+    private string? _searchValue = string.Empty;
+    private string? SearchValue
+    {
+        get => _searchValue;
+        set
+        {
+            if (value == _searchValue) return;
+            _searchValue = value;
+            DisposeTimer();
+            _searchTimer = new Timer(500);
+            _searchTimer.Elapsed += SearchTimerElapsed;
+            _searchTimer.Enabled = true;
+            _searchTimer.Start();
+        }
+    }
+
+    private async void SearchTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        DisposeTimer();
+        await _catalogItemGrid.RefreshDataAsync();
+    }
+
+    private void DisposeTimer()
+    {
+        if (_searchTimer != null)
+        {
+            _searchTimer.Enabled = false;
+            _searchTimer.Elapsed -= SearchTimerElapsed;
+            _searchTimer.Dispose();
+            _searchTimer = null;
+        }
+    }
+
+
     GridItemsProvider<ComputerCatalogItem> _catalogItemsProvider = default!;
 
     private IDialogReference? _dialog;
@@ -58,7 +100,11 @@
         _catalogItemsProvider = async req =>
         {
             using var logScope = Logger.BeginScope("Getting catalog items from API");
-            var itemsDictionary = await CatalogService.GetAllCatalogItemsAsync();
+
+            var itemsDictionary = !string.IsNullOrEmpty(SearchValue) && SearchValue.Length >= 3
+                ? await CatalogService.GetCatalogItemsBySearchTextAsync(SearchValue)
+                : await CatalogService.GetAllCatalogItemsAsync();
+
             var items = itemsDictionary.Values.ToList();
             Logger.LogInformation("{catalogItemCount} items found", items.Count);
             return GridItemsProviderResult.From(items, items.Count);
@@ -162,6 +208,16 @@
             await CatalogService.PostCreatedCatalogItem(editedCatalogItem);
         }
 
+        await _catalogItemGrid.RefreshDataAsync();
+    }
+
+    private async void HandleSearchClear()
+    {
+        if (string.IsNullOrWhiteSpace(SearchValue))
+            return;
+
+        DisposeTimer();
+        SearchValue = string.Empty;
         await _catalogItemGrid.RefreshDataAsync();
     }
 }
